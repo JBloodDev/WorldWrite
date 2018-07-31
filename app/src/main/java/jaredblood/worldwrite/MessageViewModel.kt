@@ -152,7 +152,7 @@ class MessageViewModel : ObservableViewModel(), OnMapReadyCallback {
     private fun putMarker(latLng: LatLng) {
         mWriteMarker.position = latLng
         mAddress.set("unknown")
-        class GetLocation() : AsyncTask<Unit, Unit, Unit>(){
+        class GetLocation : AsyncTask<Unit, Unit, Unit>(){
             override fun doInBackground(vararg params: Unit?) {
                 var addresses = listOf<Address>()
                 try {
@@ -194,7 +194,13 @@ class MessageViewModel : ObservableViewModel(), OnMapReadyCallback {
         val firebaseDatabase = FirebaseDatabase.getInstance()
         val messagesDatabaseReference = firebaseDatabase.reference.child("messages")
         val message = messagesDatabaseReference.push()
-        write.messageUID = message.key
+        messagesDatabaseReference.push()
+        val messageKey = message.key
+        if(messageKey == null){
+            errorDialog("firebase error referencing child as root")
+            return
+        }
+        write.messageUID = messageKey
         message.setValue(write)
         analytics().logEvent(FirebaseAnalytics.Event.SHARE, null)
         activity().finish()

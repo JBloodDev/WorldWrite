@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -117,7 +116,7 @@ class MainViewModel : ObservableViewModel() {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun onMapClick(latLng: LatLng?) {
+    private fun onMapClick(latLng: LatLng?) {
         closeWrite()
     }
 
@@ -148,26 +147,27 @@ class MainViewModel : ObservableViewModel() {
 
     //manages the data for each Write in the database
     private val messagesEventListener: ChildEventListener = object : ChildEventListener {
-        override fun onCancelled(error: DatabaseError?) {
-            Log.d("messagesEventListener", "onCancelled, ${error?.details}")
-            errorDialog("Error communicating with Firebase servers \n" + error?.details)
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.d("messagesEventListener", "onCancelled, ${error.details}")
+            errorDialog("Error communicating with Firebase servers \n" + error.details)
             //This method will be triggered in the event that this listener either failed at the server, or is removed as a result of the security and Firebase rules.
         }
 
-        override fun onChildMoved(dataSnapshot: DataSnapshot?, previousChildName: String?) {
+        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
             return
             //This method is triggered when a child location's priority changes. See setPriority(Object) and Ordered Data for more information on priorities and ordering data.
             //should never be called as all entries should be ordered by key and never change priority
         }
 
         //called on ratings change
-        override fun onChildChanged(dataSnapshot: DataSnapshot?, previousChildName: String?) {
-            val write = dataSnapshot?.getValue(Write::class.java)
+        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+            val write = dataSnapshot.getValue(Write::class.java)
             if (write != null) {
                 if (write.messageUID == selectedWrite.messageUID) {
                     selectedWrite.set(write)
                 }
-                mapMarkerToWriteHashMap.forEach { key: String, value: Write ->
+                mapMarkerToWriteHashMap.forEach {( key: String, value: Write) ->
                     if (value.messageUID == write.messageUID) {
                         mapMarkerToWriteHashMap[key] = write
                     }
@@ -176,8 +176,8 @@ class MainViewModel : ObservableViewModel() {
         }
 
         //called for every message at the start and for any new messages added
-        override fun onChildAdded(dataSnapshot: DataSnapshot?, previousChildName: String?) {
-            val write = dataSnapshot?.getValue(Write::class.java)
+        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
+            val write = dataSnapshot.getValue(Write::class.java)
             if (write != null) {
                 val marker = mMap.addMarker(MarkerOptions()
                         .position(LatLng(write.lat, write.lon))
@@ -186,7 +186,7 @@ class MainViewModel : ObservableViewModel() {
             }
         }
 
-        override fun onChildRemoved(dataSnapshot: DataSnapshot?) {
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
             return
             //only called when a message is removed while the app is running
         }
@@ -195,14 +195,14 @@ class MainViewModel : ObservableViewModel() {
 
     //manages user UID and ratings
     private val userEventListener: ValueEventListener = object : ValueEventListener {
-        override fun onCancelled(error: DatabaseError?) {
-            Log.d("userEventListener", "onCancelled, ${error?.details}")
-            errorDialog("Error communicating with Firebase servers \n" + error?.details)
+        override fun onCancelled(error: DatabaseError) {
+            Log.d("userEventListener", "onCancelled, ${error.details}")
+            errorDialog("Error communicating with Firebase servers \n" + error.details)
         }
 
         //called immediately with the contents of the current user and every time the user's data changes (after rating)
-        override fun onDataChange(snapshot: DataSnapshot?) {
-            val user = snapshot?.getValue(User::class.java)
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val user = snapshot.getValue(User::class.java)
             if (user != null) {
                 currentUser = user
             } else {//first time user
@@ -280,6 +280,7 @@ class MainViewModel : ObservableViewModel() {
             firebaseReady = false
         }
         if(googleMapReady && firebaseReady) {
+            messagesDatabaseReference.removeEventListener(messagesEventListener)
             messagesDatabaseReference.addChildEventListener(messagesEventListener)
             usersDatabaseReference = firebaseDatabase.reference.child("users").child(firebaseUser.uid)
             usersDatabaseReference.addValueEventListener(userEventListener)

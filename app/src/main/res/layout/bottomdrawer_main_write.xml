@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools">
 <data>
     <import type="jaredblood.worldwrite.Write"></import>
     <variable name="viewmodel"
@@ -21,7 +21,6 @@
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomdrawer_main_write_layout"
     android:layout_width="match_parent"
     android:layout_height="180dp"
@@ -50,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="#C8E6C9"
+        app:backgroundTint="#C8E6C9"
         android:enabled="@{!selectedWriteHasRatedGood}"
         android:includeFontPadding="false"
         android:minHeight="0dp"
@@ -70,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:backgroundTint="#FFCDD2"
+        app:backgroundTint="#FFCDD2"
         android:minHeight="0dp"
         android:minWidth="0dp"
         android:paddingBottom="4dp"
@@ -149,6 +148,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bottomdrawer_main_write_message"
-        app:srcCompat="@android:drawable/divider_horizontal_bright" />
+        app:srcCompat="@android:drawable/divider_horizontal_bright"
+        tools:ignore="ContentDescription" />
 </android.support.constraint.ConstraintLayout>
 </layout>

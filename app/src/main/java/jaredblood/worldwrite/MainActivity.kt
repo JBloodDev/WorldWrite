@@ -3,26 +3,21 @@ package jaredblood.worldwrite
 import jaredblood.worldwrite.databinding.ActivityMainBinding
 import jaredblood.worldwrite.databinding.BottomdrawerMainWriteBinding
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.View
 import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottomdrawer_main_nav.*
-import kotlinx.android.synthetic.main.bottomdrawer_main_write.*
 import android.databinding.DataBindingUtil
 import android.os.AsyncTask
-import android.os.StrictMode
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.android.synthetic.main.bottomdrawer_main_write.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(MainActivity.instance)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        val writeBind: BottomdrawerMainWriteBinding? = DataBindingUtil.bind<BottomdrawerMainWriteBinding>(binding.root.include_bottomdrawer_main_write)
+        val writeBind: BottomdrawerMainWriteBinding? = DataBindingUtil.bind(binding.root.include_bottomdrawer_main_write)
         if(writeBind != null)
             writeBinding = writeBind
         viewModel.onCreate()
