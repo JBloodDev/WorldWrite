@@ -1,12 +1,16 @@
 package jaredblood.worldwrite
 
 import android.app.Activity
+import android.arch.lifecycle.LifecycleObserver
 import android.content.Context
 import android.content.Intent
 import android.databinding.ObservableBoolean
+import android.databinding.ObservableField
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat.startActivity
 import android.support.v4.app.ActivityCompat.startActivityForResult
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.util.Log
 
@@ -20,7 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 
-class MainViewModel : ObservableViewModel() {
+class MainViewModel : ObservableViewModel(), LifecycleObserver{
 
     companion object {
         lateinit var instance: MainViewModel
@@ -39,7 +43,7 @@ class MainViewModel : ObservableViewModel() {
     lateinit var usersDatabaseReference: DatabaseReference
     lateinit var currentUser: User
     lateinit var firebaseUser: FirebaseUser
-
+    val errorMessage = ObservableField<String>("")
 
 
     fun onCreate() {
@@ -71,18 +75,6 @@ class MainViewModel : ObservableViewModel() {
         selectedWriteHasRatedGood.set(currentUser.goodRatings.contains(write.messageUID))
         selectedWriteHasRatedPoor.set(currentUser.poorRatings.contains(write.messageUID))
         activity().showWrite()
-    }
-
-    private fun context(): Context {
-        return MainActivity.instance
-    }
-
-    private fun activity(): MainActivity {
-        return MainActivity.instance
-    }
-
-    private fun analytics(): FirebaseAnalytics{
-        return MainActivity.mFirebaseAnalytics
     }
 
     private fun onMapReady(googleMap: GoogleMap) {
@@ -233,17 +225,7 @@ class MainViewModel : ObservableViewModel() {
                     RC_SIGN_IN,
                     null)
         }
-    }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == Activity.RESULT_OK) {
-                //signed in
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                activity().finishActivity()
-            }
-        }
     }
 
     fun onPause() {

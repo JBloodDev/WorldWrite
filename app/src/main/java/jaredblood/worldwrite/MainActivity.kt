@@ -11,6 +11,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottomdrawer_main_nav.*
 import android.databinding.DataBindingUtil
+import android.databinding.Observable
 import android.os.AsyncTask
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -22,25 +23,16 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        lateinit var instance: MainActivity
         lateinit var mapFragment: SupportMapFragment
-        lateinit var mFirebaseAnalytics: FirebaseAnalytics
     }
     private lateinit var viewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
     private lateinit var writeBinding: BottomdrawerMainWriteBinding
+    val errorDialog = ErrorDialog(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        instance = this
-        class InitFabric: AsyncTask<Unit, Unit, Unit>(){
-            override fun doInBackground(vararg params: Unit?) {
-                val fabric = Fabric.Builder(MainActivity.instance).kits(Crashlytics()).debuggable(true).build()
-                Fabric.with(fabric)
-            }
-        }
-        InitFabric().execute()
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(MainActivity.instance)
+        MapHandler(main_mapfragment as SupportMapFragment)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         val writeBind: BottomdrawerMainWriteBinding? = DataBindingUtil.bind(binding.root.include_bottomdrawer_main_write)
@@ -50,8 +42,10 @@ class MainActivity : AppCompatActivity() {
         binding.viewmodel = viewModel
         writeBinding.viewmodel = viewModel
         writeBinding.selectedwrite = viewModel.selectedWrite
+        viewModel.errorMessage.addOnPropertyChangedCallback(errorDialog)
         writeBinding.selectedWriteHasRatedGood = viewModel.selectedWriteHasRatedGood
         writeBinding.selectedWriteHasRatedPoor = viewModel.selectedWriteHasRatedPoor
+        lifecycle.addObserver(viewModel)
     }
 
     fun closeWrite() {
@@ -69,22 +63,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.onResume()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun onPause() {
         super.onPause()
         viewModel.onPause()
-    }
-
-    fun recreateActivity(){
-        recreate()
-    }
-
-    fun finishActivity(){
-        finish()
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -97,15 +78,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.ratePoor()
     }
 
-    fun getMapSupportFragment(): SupportMapFragment {
-        mapFragment = main_mapfragment as SupportMapFragment
-        return mapFragment
-    }
-
     @Suppress("UNUSED_PARAMETER")
     fun startMessageActivity(view: View) {
-        mFirebaseAnalytics.logEvent("attempt_share", null)
-
+        FirebaseHandler.instance.logEvent("attempt_share")
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Terms and Conditions")
         builder.setView(R.layout.item_termsandconditions)
@@ -117,7 +92,6 @@ class MainActivity : AppCompatActivity() {
         { _, _: Int ->
 
         }
-        //builder.setOnCancelListener {  }
         builder.create().show()
     }
 }

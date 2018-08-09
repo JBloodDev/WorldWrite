@@ -30,7 +30,7 @@
 
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +39,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MessageActivity" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

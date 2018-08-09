@@ -6,6 +6,15 @@ import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.security.ProviderInstaller
 
+//splashActivity
+//firebaseHandler if signed in
+///no - splashActivity start Firebase Sign in activity
+///splashActivity onActivityResult checks if signed in
+///no - finish
+///yes - start mainActivity
+//yes - start MainActivity
+
+
 
 class WorldWrite: Application(), ProviderInstaller.ProviderInstallListener {
 
